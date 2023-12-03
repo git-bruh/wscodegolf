@@ -6,7 +6,7 @@ import (
 )
 
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
-// strip -s -R .comment -R .note -R .eh_frame sys
+// strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
 
 var buffer [2048]byte
 var used uintptr = 0

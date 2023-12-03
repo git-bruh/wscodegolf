@@ -48,7 +48,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	http.HandleFunc("/echo", echo)
+	http.HandleFunc("/", echo)
 
 	fmt.Println("starting server at: ", *addr)
 	log.Fatal(http.ListenAndServe(*addr, nil))

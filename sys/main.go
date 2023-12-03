@@ -7,6 +7,8 @@ import (
 
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
 // strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
+// $ wc -c sys
+//   6928 sys
 
 var buffer [2048]byte
 var used uintptr = 0
@@ -21,7 +23,7 @@ func alloc(size uintptr, layoutPtr unsafe.Pointer) unsafe.Pointer {
 }
 
 func main() {
-	var httpInitMsg = []byte("GET /echo HTTP/1.1\r\nHost: localhost.com:8080\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version: 13\r\nConnection: keep-alive, Upgrade\r\nSec-Fetch-Mode: websocket\r\n\r\n")
+	var httpInitMsg = []byte("GET / HTTP/1.1\r\nHost:\r\nUpgrade:websocket\r\nConnection:Upgrade\r\nSec-WebSocket-Key:dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version:13\r\nConnection:Upgrade\r\n\r\n")
 	var packet = []byte{
 		0b10000001, // FIN, RSV1, RSV2, RSV3, OpCode
 		0b10000101, // Mask Bit (Compulsary for client to set) + Payload

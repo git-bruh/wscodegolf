@@ -5,9 +5,9 @@ import (
 	"unsafe"
 )
 
-// tinygo build -no-debug -scheduler=none -gc=none
+// tinygo build -no-debug -scheduler=none -gc=none -panic=trap
 
-var buffer [256]byte
+var buffer [1024]byte
 var used uintptr = 0
 
 //go:linkname alloc runtime.alloc

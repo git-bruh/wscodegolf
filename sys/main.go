@@ -8,7 +8,7 @@ import (
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
 // strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
 // $ wc -c sys
-//   6928 sys
+//   6584 sys
 
 var buffer [2048]byte
 var used uintptr = 0
@@ -39,21 +39,46 @@ func main() {
 		0b01101000,
 		0b01101110, // Payload
 	}
+	var sockaddr = [16]byte{
+		// family - AF_INET (0x2), padded to 16 bits
+		0b00000010,
+		0b00000000,
+		// port - 8080, padded to 16 bits
+		0b00011111,
+		0b10010000,
+		// addr - 127.0.0.1, 32 bits
+		// 127 << 0 | 0 << 8 | 0 << 16 | 1 << 24
+		0b01111111,
+		0b00000000,
+		0b00000000,
+		0b00000001,
+		// 64 bits of padding
+		0b00000000, 0b00000000, 0b00000000, 0b00000000,
+		0b00000000, 0b00000000, 0b00000000, 0b00000000,
+	}
 	var response [135]byte
 
-	var sa = syscall.SockaddrInet4{
-		Port: 8080,
-		Addr: [4]byte{127, 0, 0, 1},
-	}
+	// __NR_socket, AF_INET, SOCK_STREAM
+	var sock, _, _ = syscall.Syscall(41, 0x2, 0x1, 0)
 
-	var sock, _ = syscall.Socket(syscall.AF_INET, syscall.SOCK_STREAM, 0)
-	syscall.Connect(sock, &sa)
+	// __NR_connect, fd, sockaddr_in, len(sockaddr_in)
+	syscall.Syscall6(42, sock, uintptr(unsafe.Pointer(&sockaddr[0])), uintptr(len(sockaddr)), 0, 0, 0)
 
-	syscall.Sendto(sock, httpInitMsg, 0, nil)
-	var n, _, _ = syscall.Recvfrom(sock, response[:], 0)
-	syscall.Sendto(sock, packet, 0, nil)
-	syscall.Recvfrom(sock, response[n:], 0)
+	// __NR_sendto, fd, buf, len(buf), flags, addr, addr_len
+	syscall.Syscall6(44, sock, uintptr(unsafe.Pointer(&httpInitMsg[0])), uintptr(len(httpInitMsg)), 0, 0, 0)
 
-	syscall.Close(sock)
-	syscall.Write(1, response[:])
+	// __NR_recvfrom, fd, buf, len(buf), flags, addr, addr_len
+	var n, _, _ = syscall.Syscall6(45, sock, uintptr(unsafe.Pointer(&response[0])), uintptr(len(response)), 0, 0, 0)
+
+	// __NR_sendto
+	syscall.Syscall6(44, sock, uintptr(unsafe.Pointer(&packet[0])), uintptr(len(packet)), 0, 0, 0)
+
+	// __NR_recvfrom
+	syscall.Syscall6(45, sock, uintptr(unsafe.Pointer(&response[n])), uintptr(len(response))-n, 0, 0, 0)
+
+	// __NR_close
+	syscall.Syscall(3, sock, 0, 0)
+
+	// __NR_write, STDOUT_FILENO
+	syscall.Syscall(1, 1, uintptr(unsafe.Pointer(&response[0])), uintptr(len(response)))
 }

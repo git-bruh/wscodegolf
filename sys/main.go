@@ -8,16 +8,24 @@ import (
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
 // strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
 // $ wc -c sys
-//   6584 sys
+//   6592 sys
 
-var buffer [2048]byte
+var buffer [1024]byte
 var used uintptr = 0
+
+// We disable the go GC entirely and provide this stub for handling
+// allocations, giving out addresses from a static buffer on the stack
+// This saves ~152 bytes over using the "leaking" GC, it is more or less
+// used exclusively by the runtime's startup code for tasks like setting up
+// the processe's environment variables
+// If it crashes, run it with a clean environment (env -i ./sys)
 
 //go:linkname alloc runtime.alloc
 func alloc(size uintptr, layoutPtr unsafe.Pointer) unsafe.Pointer {
-	// TODO align
 	var ptr = unsafe.Pointer(&buffer[used])
-	used += size
+
+	// Align for x64
+	used += ((size + 15) &^ 15)
 
 	return ptr
 }

@@ -8,7 +8,7 @@ import (
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
 // strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
 // $ wc -c sys
-//   3202 sys
+//   2657 sys
 
 var buffer [1024]byte
 var used uintptr = 0
@@ -32,8 +32,13 @@ func alloc(size uintptr, layoutPtr unsafe.Pointer) unsafe.Pointer {
 
 //export actual_main
 func main() {
-	var httpInitMsg = []byte("GET / HTTP/1.1\r\nHost:\r\nUpgrade:websocket\r\nConnection:Upgrade\r\nSec-WebSocket-Key:dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version:13\r\nConnection:Upgrade\r\n\r\n")
-	var packet = []byte{
+	// The whole message is encoded in string directly as bytes to avoid pulling in
+	// runtime string helpers
+	var httpInitMsg = [...]byte{
+		0b1000111, 0b1000101, 0b1010100, 0b100000, 0b101111, 0b100000, 0b1001000, 0b1010100, 0b1010100, 0b1010000, 0b101111, 0b110001, 0b101110, 0b110001, 0b1101, 0b1010, 0b1001000, 0b1101111, 0b1110011, 0b1110100, 0b111010, 0b1101, 0b1010, 0b1010101, 0b1110000, 0b1100111, 0b1110010, 0b1100001, 0b1100100, 0b1100101, 0b111010, 0b1110111, 0b1100101, 0b1100010, 0b1110011, 0b1101111, 0b1100011, 0b1101011, 0b1100101, 0b1110100, 0b1101, 0b1010, 0b1000011, 0b1101111, 0b1101110, 0b1101110, 0b1100101, 0b1100011, 0b1110100, 0b1101001, 0b1101111, 0b1101110, 0b111010, 0b1010101, 0b1110000, 0b1100111, 0b1110010, 0b1100001, 0b1100100, 0b1100101, 0b1101, 0b1010, 0b1010011, 0b1100101, 0b1100011, 0b101101, 0b1010111, 0b1100101, 0b1100010, 0b1010011, 0b1101111, 0b1100011, 0b1101011, 0b1100101, 0b1110100, 0b101101, 0b1001011, 0b1100101, 0b1111001, 0b111010, 0b1100100, 0b1000111, 0b1101000, 0b1101100, 0b1001001, 0b1001000, 0b1001110, 0b1101000, 0b1100010, 0b1011000, 0b1000010, 0b1110011, 0b1011010, 0b1010011, 0b1000010, 0b1110101, 0b1100010, 0b110010, 0b110101, 0b1101010, 0b1011010, 0b1010001, 0b111101, 0b111101, 0b1101, 0b1010, 0b1010011, 0b1100101, 0b1100011, 0b101101, 0b1010111, 0b1100101, 0b1100010, 0b1010011, 0b1101111, 0b1100011, 0b1101011, 0b1100101, 0b1110100, 0b101101, 0b1010110, 0b1100101, 0b1110010, 0b1110011, 0b1101001, 0b1101111, 0b1101110, 0b111010, 0b110001, 0b110011, 0b1101, 0b1010, 0b1000011, 0b1101111, 0b1101110, 0b1101110, 0b1100101, 0b1100011, 0b1110100, 0b1101001, 0b1101111, 0b1101110, 0b111010, 0b1010101, 0b1110000, 0b1100111, 0b1110010, 0b1100001, 0b1100100, 0b1100101, 0b1101, 0b1010, 0b1101, 0b1010,
+	}
+
+	var packet = [...]byte{
 		0b10000001, // FIN, RSV1, RSV2, RSV3, OpCode
 		0b10000101, // Mask Bit (Compulsary for client to set) + Payload
 		// NOTE: We don't need to set extended payload bits if our
@@ -48,7 +53,7 @@ func main() {
 		0b01101000,
 		0b01101110, // Payload
 	}
-	var sockaddr = [16]byte{
+	var sockaddr = [...]byte{
 		// family - AF_INET (0x2), padded to 16 bits
 		0b00000010,
 		0b00000000,

@@ -3,8 +3,6 @@
     "goos": "linux",
     "goarch": "386",
     "linker": "ld.lld",
-    "rtlib": "compiler-rt",
-    "libc": "musl",
     "defaultstacksize": 65536,
     "ldflags": [
         "--gc-sections",

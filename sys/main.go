@@ -8,7 +8,7 @@ import (
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
 // strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
 // $ wc -c sys
-//   2472 sys
+//   728 sys
 
 var buffer [1024]byte
 var used uintptr = 0
@@ -29,6 +29,14 @@ func alloc(size uintptr, layoutPtr unsafe.Pointer) unsafe.Pointer {
 
 	return ptr
 }
+
+// Stubs, no runtime code is executed
+
+//go:linkname abort abort
+func abort() {}
+
+//go:linkname write write
+func write() {}
 
 //export actual_main
 func main() {

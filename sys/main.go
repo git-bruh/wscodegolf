@@ -8,7 +8,7 @@ import (
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
 // strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
 // $ wc -c sys
-//   6592 sys
+//   3202 sys
 
 var buffer [1024]byte
 var used uintptr = 0
@@ -30,6 +30,7 @@ func alloc(size uintptr, layoutPtr unsafe.Pointer) unsafe.Pointer {
 	return ptr
 }
 
+//export actual_main
 func main() {
 	var httpInitMsg = []byte("GET / HTTP/1.1\r\nHost:\r\nUpgrade:websocket\r\nConnection:Upgrade\r\nSec-WebSocket-Key:dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version:13\r\nConnection:Upgrade\r\n\r\n")
 	var packet = []byte{
@@ -89,4 +90,7 @@ func main() {
 
 	// __NR_write, STDOUT_FILENO
 	syscall.Syscall(1, 1, uintptr(unsafe.Pointer(&response[0])), uintptr(len(response)))
+
+	// __NR_exit
+	syscall.Syscall(60, 0, 0, 0)
 }

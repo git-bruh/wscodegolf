@@ -8,7 +8,7 @@ import (
 // tinygo build -no-debug -scheduler=none -gc=none -panic=trap -target=spec.json
 // strip --strip-all --strip-section-headers -R .comment -R .note -R .eh_frame sys
 // $ wc -c sys
-//   2657 sys
+//   2472 sys
 
 var buffer [1024]byte
 var used uintptr = 0
@@ -73,29 +73,29 @@ func main() {
 	var response [135]byte
 
 	// __NR_socket, AF_INET, SOCK_STREAM
-	var sock, _, _ = syscall.Syscall(41, 0x2, 0x1, 0)
+	var sock, _, _ = syscall.Syscall(359, 0x2, 0x1, 0)
 
 	// __NR_connect, fd, sockaddr_in, len(sockaddr_in)
-	syscall.Syscall6(42, sock, uintptr(unsafe.Pointer(&sockaddr[0])), uintptr(len(sockaddr)), 0, 0, 0)
+	syscall.Syscall6(362, sock, uintptr(unsafe.Pointer(&sockaddr[0])), uintptr(len(sockaddr)), 0, 0, 0)
 
 	// __NR_sendto, fd, buf, len(buf), flags, addr, addr_len
-	syscall.Syscall6(44, sock, uintptr(unsafe.Pointer(&httpInitMsg[0])), uintptr(len(httpInitMsg)), 0, 0, 0)
+	syscall.Syscall6(369, sock, uintptr(unsafe.Pointer(&httpInitMsg[0])), uintptr(len(httpInitMsg)), 0, 0, 0)
 
 	// __NR_recvfrom, fd, buf, len(buf), flags, addr, addr_len
-	var n, _, _ = syscall.Syscall6(45, sock, uintptr(unsafe.Pointer(&response[0])), uintptr(len(response)), 0, 0, 0)
+	var n, _, _ = syscall.Syscall6(371, sock, uintptr(unsafe.Pointer(&response[0])), uintptr(len(response)), 0, 0, 0)
 
 	// __NR_sendto
-	syscall.Syscall6(44, sock, uintptr(unsafe.Pointer(&packet[0])), uintptr(len(packet)), 0, 0, 0)
+	syscall.Syscall6(369, sock, uintptr(unsafe.Pointer(&packet[0])), uintptr(len(packet)), 0, 0, 0)
 
 	// __NR_recvfrom
-	syscall.Syscall6(45, sock, uintptr(unsafe.Pointer(&response[n])), uintptr(len(response))-n, 0, 0, 0)
+	syscall.Syscall6(371, sock, uintptr(unsafe.Pointer(&response[n])), uintptr(len(response))-n, 0, 0, 0)
 
 	// __NR_close
-	syscall.Syscall(3, sock, 0, 0)
+	syscall.Syscall(6, sock, 0, 0)
 
 	// __NR_write, STDOUT_FILENO
-	syscall.Syscall(1, 1, uintptr(unsafe.Pointer(&response[0])), uintptr(len(response)))
+	syscall.Syscall(4, 1, uintptr(unsafe.Pointer(&response[0])), uintptr(len(response)))
 
 	// __NR_exit
-	syscall.Syscall(60, 0, 0, 0)
+	syscall.Syscall(1, 0, 0, 0)
 }

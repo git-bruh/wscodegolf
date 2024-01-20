@@ -1,0 +1,22 @@
+{
+  "llvm-target": "x86_64-unknown-linux-musl",
+  "cpu": "x86-64",
+  "goos": "linux",
+  "goarch": "amd64",
+  "build-tags": [
+    "amd64",
+    "linux"
+  ],
+  "linker": "ld.lld",
+  "rtlib": "compiler-rt",
+  "defaultstacksize": 65536,
+  "ldflags": [
+    "--gc-sections",
+    "--discard-all",
+    "--strip-all",
+    "--no-rosegment",
+    "-znorelro",
+    "-znognustack",
+    "-entry=smol_main"
+  ]
+}

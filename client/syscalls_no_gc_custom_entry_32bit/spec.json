@@ -1,0 +1,22 @@
+{
+  "llvm-target": "i386-unknown-linux-musl",
+  "cpu": "i386",
+  "goos": "linux",
+  "goarch": "386",
+  "build-tags": [
+    "386",
+    "linux"
+  ],
+  "linker": "ld.lld",
+  "rtlib": "compiler-rt",
+  "defaultstacksize": 65536,
+  "ldflags": [
+    "--gc-sections",
+    "--discard-all",
+    "--strip-all",
+    "--no-rosegment",
+    "-znorelro",
+    "-znognustack",
+    "-entry=smol_main"
+  ]
+}

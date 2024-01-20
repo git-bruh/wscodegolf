@@ -6,21 +6,25 @@ import (
 )
 
 func main() {
-	httpInitMsg := []byte("GET / HTTP/1.1\r\nHost: dyte.io\r\nUpgrade:websocket\r\nConnection:Upgrade\r\nSec-WebSocket-Key:dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version:13\r\nConnection:Upgrade\r\n\r\n")
+	httpInitMsg := []byte("GET / HTTP/1.1\r\nHost:dyte.io\r\nUpgrade:websocket\r\nConnection:Upgrade\r\nSec-WebSocket-Key:dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version:13\r\nConnection:Upgrade\r\n\r\n")
 	wsPayload := []byte{
-		0b10000001, // FIN, RSV1, RSV2, RSV3, OpCode
-		0b10000101, // Mask Bit (Compulsary for client to set) + Payload
-		// NOTE: We don't need to set extended payload bits if our
-		// msg is less than 126 length
+		// FIN Bit (Final fragment), OpCode (1 for text payload)
+		0b10000001,
+		// Mask Bit (Required), followed by 7 bits for length (0b0000101 == 5)
+		0b10000101,
+		// We don't set the extended payload bits as our payload is only 5 bytes
+		// Mask (can be any arbritary 32 bit integer)
 		0b00000001,
 		0b00000010,
 		0b00000011,
-		0b00000100, // Mask
-		0b01101001,
-		0b01100111,
-		0b01101111,
-		0b01101000,
-		0b01101110, // Payload
+		0b00000100,
+		// Payload, the string "hello" with each character XOR'd with the
+		// corresponding mask bits
+		0b01101001, // 'h' ^ 0b00000001
+		0b01100111, // 'e' ^ 0b00000010
+		0b01101111, // 'l' ^ 0b00000011
+		0b01101000, // 'l' ^ 0b00000100
+		0b01101110, // 'o' ^ 0b00000001
 	}
 	// Connects to an IPv4 server at 127.0.0.1 on port 8080
 	sockaddr := []byte{

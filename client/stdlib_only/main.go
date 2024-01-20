@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	httpInitMsg := []byte("GET / HTTP/1.1\r\nHost: dyte.io\r\nUpgrade:websocket\r\nConnection:Upgrade\r\nSec-WebSocket-Key:dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version:13\r\nConnection:Upgrade\r\n\r\n")
+	httpInitMsg := []byte("GET / HTTP/1.1\r\nHost:dyte.io\r\nUpgrade:websocket\r\nConnection:Upgrade\r\nSec-WebSocket-Key:dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version:13\r\nConnection:Upgrade\r\n\r\n")
 	wsPayload := []byte{
 		// FIN Bit (Final fragment), OpCode (1 for text payload)
 		0b10000001,

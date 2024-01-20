@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	url := "ws://localhost:8080/echo"
+	url := "ws://localhost:8080/"
 	ws, err := websocket.Dial(url, "", url)
 
 	if err != nil {

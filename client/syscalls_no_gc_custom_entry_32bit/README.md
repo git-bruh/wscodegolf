@@ -1,4 +1,4 @@
-## Syscalls only, dummy GC, custom ldflags, custom entrypoint, 32-bit
+## Syscalls only, no GC, custom ldflags, custom entrypoint, 32-bit
 
 `tinygo build -o main -no-debug -scheduler none -gc none -panic trap -target spec.json`
 
